@@ -1,15 +1,16 @@
+require 'active_support/core_ext/hash/indifferent_access'
+
 module Enumerize
   module Integrations
     module RSpec
       class Matcher
-        attr_accessor :attr, :values, :subject, :default
 
         def initialize(attr)
           self.attr = attr
         end
 
         def in(*values)
-          self.values = values.map(&:to_s).sort
+          self.values = values
           self
         end
 
@@ -40,34 +41,53 @@ module Enumerize
         end
 
         private
-
+        attr_accessor :attr, :values, :subject, :default
 
         def expectation
           "#{subject.class.name} to #{description}"
         end
 
         def matches_attributes?
-          values == enumerized_values
+          matches_array_attributes? || matches_hash_attributes?
+        end
+
+        def matches_array_attributes?
+          sorted_values == enumerized_values
+        end
+
+        def matches_hash_attributes?
+          return unless values.first.respond_to?(:invert)
+          _values = values.first.invert.with_indifferent_access
+          _value_hash = value_hash.with_indifferent_access
+          _values.map { |k, v| _value_hash[k.to_s] == v; }
         end
 
         def matches_default_value?
           default == enumerized_default
         end
 
+        def sorted_values
+          @sorted_values ||=values.map(&:to_s).sort
+        end
+
         def enumerized_values
-          @enumerized_values ||= attributes[attr.to_s].values.sort
+          @enumerized_values ||= attributes.values.sort
         end
 
         def enumerized_default
-          @enumerized_default ||= attributes[attr.to_s].default_value
+          @enumerized_default ||= attributes.default_value
+        end
+
+        def value_hash
+          @value_hash ||= attributes.instance_variable_get('@value_hash')
         end
 
         def attributes
-          subject.class.enumerized_attributes.attributes
+          subject.class.enumerized_attributes.attributes[attr.to_s]
         end
 
         def quote_values(values)
-          values.map(&:inspect).join(', ')
+          sorted_values.map(&:inspect).join(', ')
         end
       end
     end

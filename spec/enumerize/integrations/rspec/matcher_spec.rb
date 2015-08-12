@@ -26,8 +26,8 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
         expect(subject).to enumerize(:sex).in(:male, :female)
       end
 
-      xit 'accepts the right params as a hash' do
-        expect(subject).to enumerize(:sex).in(male: 0, female: 1)
+      it 'accepts the the right params in a different order' do
+        expect(subject).to enumerize(:sex).in(:female, :male)
       end
 
       it 'rejects wrong params' do
@@ -35,12 +35,6 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
         expect do
           expect(subject).to enumerize(:sex).in(:boy, :girl)
         end.to fail_with(message)
-      end
-
-      xit 'rejects the params in a wrong order' do
-        expect {
-          expect(subject).to enumerize(:sex).in(:female, :male)
-        }.to fail
       end
     end
 
@@ -54,8 +48,16 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
         expect(subject).to enumerize(:sex).in(:male, :female)
       end
 
-      xit 'accepts the right params as a hash' do
+      it 'accepts the right params as a hash' do
         expect(subject).to enumerize(:sex).in(male: 0, female: 1)
+      end
+
+      it 'accepts the right params as a hash in a different order' do
+        expect(subject).to enumerize(:sex).in(female: 1, male: 0)
+      end
+
+      it 'accepts the right params with the key and values as string' do
+        expect(subject).to enumerize(:sex).in('male' => '0', 'female' => '1')
       end
     end
 
