@@ -3,6 +3,10 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
   let(:model) do
     Class.new do
       extend Enumerize
+
+      def self.name
+        'Model'
+      end
     end
   end
 
@@ -27,7 +31,7 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
       end
 
       it 'rejects wrong params' do
-        message = ' expected :sex to allow values: "boy", "girl", but it allows "female", "male" instead'
+        message = 'Expected Model to define enumerize :sex in: "boy", "girl"'
         expect do
           expect(subject).to enumerize(:sex).in(:boy, :girl)
         end.to fail_with(message)
@@ -57,7 +61,7 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
 
     it 'has the right description' do
       matcher = enumerize(:sex).in(:male, :female)
-      expect(matcher.description).to eq('enumerize :sex in: "female", "male"')
+      expect(matcher.description).to eq('define enumerize :sex in: "female", "male"')
     end
   end
 
@@ -72,14 +76,14 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
     end
 
     it 'rejects the wrong default value' do
-      message = ' expected :sex to have "male" as default value, but it sets "female" instead'
+      message = 'Expected Model to define enumerize :sex in: "female", "male" with "male" as default value'
       expect do
         expect(subject).to enumerize(:sex).in(:male, :female).with_default(:male)
       end.to fail_with(message)
     end
 
     it 'rejects if the `in` is wrong with a correct default value' do
-      message = ' expected :sex to allow values: "boy", "girl", but it allows "female", "male" instead'
+      message = 'Expected Model to define enumerize :sex in: "boy", "girl" with "female" as default value'
       expect do
         expect(subject).to enumerize(:sex).in(:boy, :girl).with_default(:female)
       end.to fail_with(message)
@@ -87,7 +91,7 @@ RSpec.describe Enumerize::Integrations::RSpec::Matcher do
 
     it 'has the right description' do
       matcher = enumerize(:sex).in(:male, :female).with_default(:female)
-      message = 'enumerize :sex in: "female", "male" with "female" as default value'
+      message = 'define enumerize :sex in: "female", "male" with "female" as default value'
       expect(matcher.description).to eq(message)
     end
   end

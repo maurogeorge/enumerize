@@ -19,19 +19,11 @@ module Enumerize
         end
 
         def failure_message
-          message  = " expected :#{attr} to allow value#{values.size == 1 ? nil : 's'}: #{quote_values(values)},"
-          message += " but it allows #{quote_values(enumerized_values)} instead"
-
-          if default && !matches_default_value?
-            message  = " expected :#{attr} to have #{default.inspect} as default value,"
-            message += " but it sets #{enumerized_default.inspect} instead"
-          end
-
-          message
+          "Expected #{expectation}"
         end
 
         def description
-          description  = "enumerize :#{attr} in: #{quote_values(values)}"
+          description  = "define enumerize :#{attr} in: #{quote_values(values)}"
           description += " with #{default.inspect} as default value" if default
 
           description
@@ -48,6 +40,11 @@ module Enumerize
         end
 
         private
+
+
+        def expectation
+          "#{subject.class.name} to #{description}"
+        end
 
         def matches_attributes?
           values == enumerized_values
